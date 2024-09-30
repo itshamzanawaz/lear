@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+}
+
+.movies-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.movie {
+    margin: 20px;
+    width: 200px;
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.movie img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+.movie h2 {
+    margin: 10px;
+}
+
+.movie p {
+    margin: 10px;
+}
+    </style>
+</head>
+<body>
+    <h1>Movies</h1>
+    <div class="movies-container"></div>
+    <script >
+
+
+
+
+
+
+const api_url = 'https://ap-south-1.cdn.hygraph.com/content/clzledc4q00rq07uz85r8uo2g/master';
+const container = document.querySelector('.movies-container');
+
+fetch(api_url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        query: `
+            query MyQuery {
+                movies(stage: PUBLISHED) {
+                    moviePoster {
+                        url
+                    }
+                    movieTrailer {
+                        url
+                    }
+                    id
+                    title
+                }
+            }
+        `
+    })
+})
+.then(response => response.json())
+.then(data => {
+    const movies = data.data.movies;
+    movies.forEach(movie => {
+        const movieElement = document.createElement('div');
+        movieElement.classList.add('movie');
+        movieElement.innerHTML = `
+            <img src="${movie.moviePoster.url}" alt="${movie.title}">
+            <h2>${movie.title}</h2>
+            <p>Trailer: <a href="${movie.movieTrailer.url}">Watch</a></p>
+            <p>ID: ${movie.id}</p>
+        `;
+        container.appendChild(movieElement);
+    });
+})
+.catch(error => console.error(error));
+    </script>
+</body>
+</html>
